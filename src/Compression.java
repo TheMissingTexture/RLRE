@@ -1,20 +1,55 @@
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class Compression {
     public static void main(String[] args) throws IOException {
         byte[] data = getFile();
         ArrayList<String> binaryArray = convertBin(data);
+        ArrayList<String> hexList = convertHex(binaryArray);
+        ArrayList<String> finalCompression = compress(hexList);
+        writeFinal(finalCompression);
 
     }
 
     public static byte[] getFile() throws IOException {
-        Path path = Paths.get("C:\\Users\\dowli\\Desktop\\testfile.txt");
-        byte[] data = Files.readAllBytes(path);
-        return data;
+        Path path = Paths.get("C:\\Users\\dowli\\Desktop\\TestFiles\\BeeMovieScript.docx");
+        return Files.readAllBytes(path);
+    }
+
+    public static ArrayList<String> convertHex(ArrayList<String> binData) {
+        HashMap<String, String> binToHex = new HashMap<>();
+        ArrayList<String> hexList = new ArrayList<>();
+        binToHex.put("0000", "A");
+        binToHex.put("0001", "B");
+        binToHex.put("0010", "C");
+        binToHex.put("0011", "D");
+        binToHex.put("0100", "E");
+        binToHex.put("0101", "F");
+        binToHex.put("0110", "G");
+        binToHex.put("0111", "J");
+        binToHex.put("1000", "K");
+        binToHex.put("1001", "L");
+        binToHex.put("1010", "M");
+        binToHex.put("1011", "N");
+        binToHex.put("1100", "O");
+        binToHex.put("1101", "P");
+        binToHex.put("1110", "Q");
+        binToHex.put("1111", "R");
+
+        for (String item : binData) {
+            String itema = item.substring(0, item.length() / 2);
+            String itemb = item.substring(item.length() / 2);
+            hexList.add(binToHex.get(itema) + binToHex.get(itemb));
+        }
+
+        return hexList;
     }
 
     public static ArrayList<String> convertBin(byte[] data){
@@ -28,21 +63,49 @@ public class Compression {
                 binary = remainder + binary;
                 number /= 2;
             }
+            if (binary.length() != 8){
+                binary = ("0".repeat(8-binary.length()) + binary);
+            }
             binaryArray.add(binary);
         }
         return binaryArray;
     }
-    public static void compress(ArrayList<String> binaryArray){
-        ArrayList<String> finalCompression = new ArrayList<>();
 
-        }
-    }
     public static boolean checkUsed(ArrayList<String> current, String checkFor){
         for (String item : current){
-            if (item == checkFor){
+            if (Objects.equals(item, checkFor)){
                 return true;
             }
         }
         return false;
     }
+    public static ArrayList<String> compress(ArrayList<String> binaryArray) {
+        ArrayList<String> finalCompression = new ArrayList<>();
+        HashMap<String, String> translations = new HashMap<>();
+
+        int nextCode = 0;
+        int counter = 0;
+        String last = "";
+
+        for (String item : binaryArray){
+            if (item == last){
+                counter += 1;
+            }
+            else if (!(counter == 1) && !(counter == 2)){
+                finalCompression.add(last + "-" + counter);
+
+            }
+        }
+        return finalCompression;
+    }
+
+    public static void writeFinal(ArrayList<String> finalCompression) throws IOException {
+        File makeFile = new File("C:\\Users\\dowli\\Desktop\\TestFiles\\compressed2.txt");
+        FileWriter compressed = new FileWriter("C:\\Users\\dowli\\Desktop\\TestFiles\\compressed2.txt");
+        for (String item : finalCompression){
+            compressed.write(item + ",");
+        }
+        compressed.close();
+    }
+
 }
