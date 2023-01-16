@@ -19,7 +19,7 @@ public class Compression {
     }
 
     public static byte[] getFile() throws IOException {
-        Path path = Paths.get("C:\\Users\\dowli\\Desktop\\TestFiles\\BeeMovieScript.docx");
+        Path path = Paths.get("C:\\Users\\dowli\\Desktop\\TestFiles\\testfile2.rtf");
         return Files.readAllBytes(path);
     }
 
@@ -83,17 +83,23 @@ public class Compression {
         ArrayList<String> finalCompression = new ArrayList<>();
         HashMap<String, String> translations = new HashMap<>();
 
-        int nextCode = 0;
         int counter = 0;
-        String last = "";
-
+        String code = "";
         for (String item : binaryArray){
-            if (item == last){
-                counter += 1;
+            if (code.length() == 8){
+                if (checkUsed(finalCompression, code)){
+                    finalCompression.add(translations.get(code));
+                    code = "";
+                }
+                else {
+                    finalCompression.add(code);
+                    translations.put(code, String.valueOf(counter));
+                    counter += 1;
+                    code = "";
+                }
             }
-            else if (!(counter == 1) && !(counter == 2)){
-                finalCompression.add(last + "-" + counter);
-
+            else {
+                code = code + item;
             }
         }
         return finalCompression;
