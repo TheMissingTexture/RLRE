@@ -14,7 +14,8 @@ public class Compression {
         ArrayList<String> binaryArray = convertBin(data);
         ArrayList<String> hexList = convertHex(binaryArray);
         ArrayList<String> finalCompression = compress(hexList);
-        writeFinal(finalCompression);
+        ArrayList<String> rleArray = RLE(finalCompression);
+        writeFinal(rleArray);
 
     }
 
@@ -85,6 +86,7 @@ public class Compression {
 
         int counter = 0;
         String code = "";
+
         for (String item : binaryArray){
             if (code.length() == 8){
                 if (checkUsed(finalCompression, code)){
@@ -99,10 +101,35 @@ public class Compression {
                 }
             }
             else {
-                code = code + item;
+                                                                                                                                                                                                                     code = code + item;
             }
         }
         return finalCompression;
+    }
+
+    public static ArrayList<String> RLE(ArrayList<String> finalCompression){
+        ArrayList<String> rleArray = new ArrayList<>();
+
+        String using = "";
+        int counter = 1 ;
+
+        for (String item : finalCompression){
+            if (item == using){
+                counter += 1;
+            }
+            else {
+                if (counter == 1){
+                    rleArray.add(using);
+                }
+                else{
+                    rleArray.add(using + " " + counter);
+
+                }
+                using = item;
+                counter = 1;
+            }
+        }
+        return rleArray;
     }
 
     public static void writeFinal(ArrayList<String> finalCompression) throws IOException {
